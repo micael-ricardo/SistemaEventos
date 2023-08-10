@@ -8,6 +8,7 @@ describe('Event test', () => {
         const event = {
             title: 'Pagodinho Teste',
             price: [{ sector: 'Pista', amount: '20' }],
+            categories: ['Show'],
             description: 'Evento Descrição',
             city: 'Belo Horizonte',
             location: {
