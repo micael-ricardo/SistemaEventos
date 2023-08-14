@@ -12,7 +12,7 @@ describe('Event test', () => {
             description: 'Evento Descrição',
             city: 'Belo Horizonte',
             location: {
-                latitude: '-19.8658619',
+                latitude: '-19.8658659',
                 longitude: '-43.9737064',
             },
             coupons: [],
@@ -23,6 +23,7 @@ describe('Event test', () => {
             .post('/events')
             .field('title', event.title)
             .field('description', event.description)
+            .field('categories', event.categories)
             .field('city', event.city)
             .field('coupons', event.coupons)
             .field('participants', event.participants)
@@ -35,10 +36,8 @@ describe('Event test', () => {
             .attach('flyers', '/Users/micae/Downloads/flyer1.png');
 
             if(response.error){
-                console.log('Erro:', response.error);
-                
+                console.log('Erro:', response.error);  
             }
-
         expect(response.status).toBe(201);
         expect(response.body).toEqual({ message: 'Evento Criado com sucesso.' });
     });

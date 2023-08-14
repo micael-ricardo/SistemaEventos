@@ -5,12 +5,51 @@ import { EventUseCase } from "../useCases/EventUseCase";
 class EventController {
     constructor(private eventUseCase: EventUseCase) { }
     async create(request: Request, response: Response, next: NextFunction) {
-        const eventData: Event = request.body;
+        let eventData: Event = request.body;
+
+        const files = request.files as any;
+
+        if (files) {
+            const banner = files.banner[0]
+            const flyers = files.flyers
+
+            eventData = {
+                // ... spredAltereitor ele copia os dados que já esta na let e assim posso passar o resto 
+                ...eventData,
+                banner: banner.filename,
+                flyers: flyers.map((flyer: any) => flyer.filename),
+            };
+        }
         try {
             await this.eventUseCase.create(eventData);
             return response.status(201).json({ message: 'Evento Criado com sucesso.' });
         } catch (error) {
             next(error);
+        }
+    }
+    async findEventByLocation(request: Request, response: Response, next: NextFunction) {
+        const { latitude, longitude } = request.query
+        try {
+            const events = await this.eventUseCase.findEventByLocation(
+                String(latitude),
+                String(longitude)
+            )
+            return response.status(200).json(events)
+        } catch (error) {
+            next(error)
+        }
+    }
+    async findEventsByCategory(request: Request, response: Response, next: NextFunction) {
+        const { category } = request.params;
+        console.log(category);
+        
+        try {
+            const events = await this.eventUseCase.findEventsByCategory(
+                String(category),
+            )
+            return response.status(200).json(events)
+        } catch (error) {
+            next(error)
         }
     }
 }
