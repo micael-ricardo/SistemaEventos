@@ -5,10 +5,12 @@ import { EventRepository } from "../repositories/EventRepository";
 
 class EventUseCase {
     constructor(private eventRepository: EventRepository) { }
+
     async create(eventData: Event) {
 
         if (!eventData.banner) throw new HttpException(400, 'Banner is required');
         if (!eventData.flyers) throw new HttpException(400, 'flyers is required');
+        if (!eventData.date) throw new HttpException(400, 'date is required');
         if (!eventData.location) throw new HttpException(400, 'location is required');
 
         // Verificar se já existe evento no mesmo local e horario
@@ -32,28 +34,34 @@ class EventUseCase {
         const cityName = await this.getCityNameByCoordinates(latitude, longitude);
         const findEventsByCity = await this.eventRepository.findEventsByCity(cityName)
         // fórmula de haversine
-        const eventWithRadius = findEventsByCity.filter(event =>{
-           const distance = this.calculateDistance(
-            Number(latitude),
-            Number(longitude),
-            Number(event.location.latitude),
-            Number(event.location.longitude)
-           )
-           return distance <= 3
-        })
+        const eventWithRadius = findEventsByCity.filter(event => {
+            const distance = this.calculateDistance(
+                Number(latitude),
+                Number(longitude),
+                Number(event.location.latitude),
+                Number(event.location.longitude)
+            );
+            return distance <= 3;
+        });
         return eventWithRadius;
-        
-
     }
 
-    async findEventsByCategory(category: string){
-        if(!category) throw new HttpException(400,'Category is required');
-        
-      const events = await this.eventRepository.findEventsByCategory(category)
-
-      return events;
+    async findEventsByCategory(category: string) {
+        if (!category) throw new HttpException(400, 'Category is required');
+        const events = await this.eventRepository.findEventsByCategory(category)
+        return events;
     }
 
+    async findEventsByName(name: string) {
+        if (!name) throw new HttpException(400, 'Name is required');
+        const events = await this.eventRepository.findEventsByName(name)
+        return events;
+    }
+    async findEventById(id: string) {
+        if (!id) throw new HttpException(400, 'Id is required');
+        const events = await this.eventRepository.findEventById(id)
+        return events;
+    }
     private async getCityNameByCoordinates(latitude: string, longitude: string) {
         try {
             const response = await axios.get(
